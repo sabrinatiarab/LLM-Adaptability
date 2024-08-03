@@ -7,16 +7,21 @@ def generate_questions(api_key, document_text, num_questions=5):
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}"
     }
+    instructions = (
+        f"Berdasarkan teks berikut, buatlah {num_questions} pertanyaan pilihan ganda dalam bahasa Indonesia. "
+        "Setiap pertanyaan harus memiliki 4 pilihan jawaban (A, B, C, D) dan menunjukkan pilihan jawaban yang benar. "
+        "Teks: "
+    )
     data = {
         "model_name": "brain-v2",
         "messages": [
             {
                 "role": "system",
-                "content": "Anda diminta untuk membuat 5 pertanyaan pilihan ganda (ABCD) berdasarkan teks berikut dalam bahasa Indonesia."
+                "content": "Anda adalah asisten AI yang dapat membantu membuat pertanyaan pilihan ganda."
             },
             {
                 "role": "user",
-                "content": document_text
+                "content": instructions + document_text
             }
         ],
         "max_new_tokens": 500,
