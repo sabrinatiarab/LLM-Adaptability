@@ -1,7 +1,7 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, jsonify
 import os
 import fitz  # PyMuPDF
-from generate_questions import generate_questions, parse_questions
+from generate_questions import generate_questions
 
 app = Flask(__name__)
 
@@ -14,7 +14,6 @@ def load_document(file_path):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    questions = []
     if request.method == 'POST':
         file = request.files['file']
         api_key = request.form['api_key']
@@ -24,10 +23,22 @@ def index():
             file.save(file_path)
             
             document_text = load_document(file_path)
-            response = generate_questions(api_key, document_text)
-            questions = parse_questions(response)
+            questions = generate_questions(api_key, document_text)
             
-    return render_template('index.html', questions=questions)
+            return jsonify(questions)
+    else:
+        return '''
+        <h1>Upload Document and Generate Questions</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <label for="file">Choose PDF file:</label>
+            <input type="file" name="file" id="file" required>
+            <br>
+            <label for="api_key">Enter API Key:</label>
+            <input type="text" name="api_key" id="api_key" required>
+            <br>
+            <button type="submit">Generate Questions</button>
+        </form>
+        '''
 
 if __name__ == '__main__':
     if not os.path.exists('uploads'):
